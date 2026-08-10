@@ -1,6 +1,6 @@
 {
     "name": "Photon Address Autocomplete (DACH)",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "acceptableVersions": [
         "^10.0"
     ],
@@ -9,5 +9,5 @@
     ],
     "releaseDate": "2026-08-10",
     "author": "GIM",
-    "description": "Adress-Autocomplete fuer die DACH-Region (CH/DE/AT) auf Basis der Open-Source-Suchmaschine Photon (OpenStreetMap). Liefert einen serverseitigen Proxy-Endpoint (/api/v1/PhotonAddress/search) sowie eine erweiterte Address-Feldansicht auf Basis von ui/autocomplete mit automatischer Befuellung von Strasse, PLZ, Ort, Kanton/Bundesland und Land. Nur fuer EspoCRM 10.x."
+    "description": "Adress-Autocomplete auf Basis der Open-Source-Suchmaschine Photon (OpenStreetMap). Die teilnehmenden Laender steuert die Standardliste unter Administration > Adresse Laender (Flag 'Wird bevorzugt'); ohne Auswahl gilt der DACH-Default (CH/DE/AT). Liefert einen serverseitigen Proxy-Endpoint (/api/v1/PhotonAddress/search) sowie eine erweiterte Address-Feldansicht auf Basis von ui/autocomplete mit automatischer Befuellung von Strasse, PLZ, Ort, Kanton/Bundesland und Land. Nur fuer EspoCRM 10.x."
 }

@@ -3,6 +3,27 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.1.0] – 2026-08-10
+
+### Neu
+
+- Die teilnehmenden Länder steuert jetzt die Standardliste unter
+  **Administration → Adresse Länder**: alle Einträge mit dem Flag
+  **«Wird bevorzugt»** werden als `countrycode`-Filter an Photon übergeben
+  und serverseitig als zweite Verteidigungslinie geprüft.
+  Auswertungsreihenfolge: `photonAddressCountryCodes` in `data/config.php`
+  (manueller Override) → bevorzugte Länder der Adminliste → Fallback
+  `['ch','de','at']`. Die Abfrage der Länderliste ist pro Request
+  memoisiert; ein Fehler beim Lesen kippt das Autocomplete nicht,
+  sondern fällt auf den DACH-Default zurück.
+
+### Geändert
+
+- `AfterInstall` belegt `photonAddressCountryCodes` nicht mehr vor.
+  Migration: Steht in der Config exakt der alte Auto-Default
+  `['ch','de','at']`, wird der Schlüssel entfernt, damit die Adminliste
+  greift. Ein bewusst abweichend gesetzter Wert bleibt erhalten.
+
 ## [1.0.1] – 2026-08-10
 
 ### Behoben

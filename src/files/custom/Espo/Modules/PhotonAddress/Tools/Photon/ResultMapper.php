@@ -25,7 +25,7 @@ class ResultMapper
 
         $countryCode = strtoupper(trim((string) ($properties['countrycode'] ?? '')));
 
-        // Anforderung 4: DACH-Filter. Der Parameter countrycode wird bereits
+        // Anforderung 4: Laenderfilter. Der Parameter countrycode wird bereits
         // an Photon uebergeben; diese Pruefung ist die zweite Verteidigungslinie
         // fuer den Fall, dass eine (aeltere) Photon-Instanz den Parameter
         // ignoriert.

@@ -21,9 +21,12 @@ class AfterInstall
         /** @var ConfigWriter $configWriter */
         $configWriter = $container->get('injectableFactory')->create(ConfigWriter::class);
 
+        // photonAddressCountryCodes wird bewusst NICHT mehr vorbelegt:
+        // die Laender kommen aus der Standardliste (Administration >
+        // Adresse Laender, Flag "Wird bevorzugt"). Der Config-Schluessel
+        // bleibt als manueller Override moeglich.
         $defaults = [
             'photonAddressUrl' => 'https://photon.komoot.io/api/',
-            'photonAddressCountryCodes' => ['ch', 'de', 'at'],
             'photonAddressLang' => 'de',
             'photonAddressLimit' => 5,
             'photonAddressTimeout' => 4,
@@ -38,6 +41,15 @@ class AfterInstall
                 $configWriter->set($key, $value);
                 $isChanged = true;
             }
+        }
+
+        // Migration von <= 1.0.x: dort hat AfterInstall ['ch','de','at']
+        // in die Config geschrieben. Genau dieser unveraenderte Default
+        // wird entfernt, damit die Adminliste greift. Ein vom Admin
+        // bewusst gesetzter (abweichender) Wert bleibt bestehen.
+        if ($config->get('photonAddressCountryCodes') === ['ch', 'de', 'at']) {
+            $configWriter->remove('photonAddressCountryCodes');
+            $isChanged = true;
         }
 
         if ($isChanged) {

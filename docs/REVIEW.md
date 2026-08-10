@@ -124,7 +124,7 @@ Weitere Adressfelder aktivieren – Datei
 | Parameter | Default | Bedeutung |
 |-----------|---------|-----------|
 | `photonAddressUrl` | `https://photon.komoot.io/api/` | Endpoint, für Self-Hosting ändern |
-| `photonAddressCountryCodes` | `['ch','de','at']` | erlaubte Länder |
+| `photonAddressCountryCodes` | – (Adminliste) | manueller Länder-Override; ohne Eintrag gelten die bevorzugten Länder aus Administration → Adresse Länder, Fallback `['ch','de','at']` |
 | `photonAddressLang` | `de` | Sprache der Bezeichnungen |
 | `photonAddressLimit` | `5` | ausgelieferte Treffer |
 | `photonAddressTimeout` | `4` | Sekunden |

@@ -39,7 +39,7 @@ class SearchService
 
         try {
             // Bewusst mehr Treffer anfragen als ausgeliefert werden:
-            // der defensive DACH-Filter und die Deduplizierung koennen
+            // der defensive Laenderfilter und die Deduplizierung koennen
             // Eintraege entfernen. Bei limit=5 direkt an Photon koennte
             // sonst eine leere Liste zurueckkommen.
             $features = $this->client->search($q, min($limit * 3, 20));

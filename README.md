@@ -60,12 +60,29 @@ Weitere Adressfelder aktivieren – `custom/Espo/Custom/Resources/metadata/entit
 
 ## Konfiguration
 
-Optional in `data/config.php`; ohne Eintrag gelten die Defaults.
+### Länderauswahl
+
+Welche Länder am Autocomplete teilnehmen, steuert die Standardliste unter
+**Administration → Adresse Länder**: alle Einträge mit dem Flag
+**«Wird bevorzugt»** werden als `countrycode`-Filter an Photon übergeben.
+Reihenfolge der Auswertung:
+
+1. `photonAddressCountryCodes` in `data/config.php` — manueller Override,
+   übersteuert die Adminliste (normalerweise nicht setzen).
+2. Bevorzugte Länder aus **Administration → Adresse Länder**.
+3. Fallback `['ch','de','at']`, falls keine Länder bevorzugt sind.
+
+Der Suchcache berücksichtigt die Länderliste im Cache-Key; nach einer
+Änderung der bevorzugten Länder greifen neue Suchen sofort.
+
+### Parameter in `data/config.php`
+
+Optional; ohne Eintrag gelten die Defaults.
 
 | Parameter | Default | Bedeutung |
 |-----------|---------|-----------|
 | `photonAddressUrl` | `https://photon.komoot.io/api/` | Endpoint, für Self-Hosting ändern |
-| `photonAddressCountryCodes` | `['ch','de','at']` | erlaubte Länder |
+| `photonAddressCountryCodes` | – (Adminliste) | manueller Länder-Override, s. o. |
 | `photonAddressLang` | `de` | Sprache der Bezeichnungen |
 | `photonAddressLimit` | `5` | ausgelieferte Treffer |
 | `photonAddressTimeout` | `4` | Sekunden |
