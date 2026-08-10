@@ -29,6 +29,8 @@ use Throwable;
  *   'photonAddressTimeout'      => 4,
  *   'photonAddressCacheTtl'     => 86400,
  *   'photonAddressLayers'       => ['house', 'street'],
+ *   'photonAddressBiasZoom'     => 12,   // Stadt-Massstab
+ *   'photonAddressBiasScale'    => 0.4,  // 0..1, Photon-Default 0.2
  */
 class PhotonConfig
 {
@@ -40,6 +42,8 @@ class PhotonConfig
     private const int DEFAULT_CACHE_TTL = 86400;
     private const int MAX_LIMIT = 20;
     private const int COUNTRY_QUERY_LIMIT = 500;
+    private const int DEFAULT_BIAS_ZOOM = 12;
+    private const float DEFAULT_BIAS_SCALE = 0.4;
 
     /** @var string[]|null */
     private ?array $countryCodes = null;
@@ -166,6 +170,37 @@ class PhotonConfig
         $ttl = $this->config->get('photonAddressCacheTtl');
 
         return $ttl === null ? self::DEFAULT_CACHE_TTL : max(0, (int) $ttl);
+    }
+
+    /**
+     * OSM-Zoomstufe des Location-Bias: 12 entspricht Stadt-Massstab,
+     * kleinere Werte gewichten grossraeumiger, groessere enger.
+     */
+    public function getBiasZoom(): int
+    {
+        $zoom = $this->config->get('photonAddressBiasZoom');
+
+        if (!is_numeric($zoom)) {
+            return self::DEFAULT_BIAS_ZOOM;
+        }
+
+        return max(1, min((int) $zoom, 18));
+    }
+
+    /**
+     * Gewicht des Location-Bias (0..1). Photons eigener Default waere
+     * 0.2; die Extension nutzt 0.4, damit der Formularkontext spuerbar
+     * durchschlaegt.
+     */
+    public function getBiasScale(): float
+    {
+        $scale = $this->config->get('photonAddressBiasScale');
+
+        if (!is_numeric($scale)) {
+            return self::DEFAULT_BIAS_SCALE;
+        }
+
+        return max(0.0, min((float) $scale, 1.0));
     }
 
     /**

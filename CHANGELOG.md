@@ -3,6 +3,19 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.4.0] – 2026-08-10
+
+### Neu
+
+- Der Location-Bias ist konfigurierbar: **Orts-Bias: Zoomstufe**
+  (`photonAddressBiasZoom`, 1–18, Default 12 ≈ Stadt-Massstab) und
+  **Orts-Bias: Gewicht** (`photonAddressBiasScale`, 0–1, Default 0.4,
+  0 schaltet den Bias ab; Photons eigener Default wäre 0.2). Beide
+  Felder stehen auf der Einstellungsseite
+  **Administration → Photon Address Autocomplete** (DE/EN übersetzt),
+  `AfterInstall` belegt die Defaults vor, und der Such-Cache-Key
+  berücksichtigt beide Werte — Änderungen greifen sofort.
+
 ## [1.3.2] – 2026-08-10
 
 ### Behoben

@@ -32,6 +32,8 @@ class AfterInstall
             'photonAddressTimeout' => 4,
             'photonAddressCacheTtl' => 86400,
             'photonAddressLayers' => [],
+            'photonAddressBiasZoom' => 12,
+            'photonAddressBiasScale' => 0.4,
         ];
 
         $isChanged = false;

@@ -105,6 +105,8 @@ Optional; ohne Eintrag gelten die Defaults.
 | `photonAddressTimeout` | `4` | Sekunden |
 | `photonAddressCacheTtl` | `86400` | Sekunden, `0` schaltet den Cache ab |
 | `photonAddressLayers` | `[]` | z. B. `['house','street']` für reine Adresstreffer |
+| `photonAddressBiasZoom` | `12` | OSM-Zoomstufe des Orts-Bias (1–18), 12 ≈ Stadt-Massstab |
+| `photonAddressBiasScale` | `0.4` | Gewicht des Orts-Bias (0–1), Photon-Default 0.2 |
 
 ## Antwortformat
 

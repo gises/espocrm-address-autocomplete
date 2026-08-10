@@ -24,6 +24,10 @@ define(['views/settings/record/edit'], function (Dep) {
                         {name: 'photonAddressUrl'},
                         {name: 'photonAddressLang'},
                     ],
+                    [
+                        {name: 'photonAddressBiasZoom'},
+                        {name: 'photonAddressBiasScale'},
+                    ],
                 ],
             },
         ]

@@ -256,6 +256,8 @@ class SearchService
             $this->photonConfig->getLang(),
             implode(',', $this->photonConfig->getCountryCodes()),
             implode(',', $this->photonConfig->getLayers()),
+            $this->photonConfig->getBiasZoom(),
+            $this->photonConfig->getBiasScale(),
             $this->photonConfig->getUrl(),
         ]));
     }

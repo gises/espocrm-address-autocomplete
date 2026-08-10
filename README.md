@@ -107,6 +107,8 @@ Optional; without an entry the defaults apply.
 | `photonAddressTimeout` | `4` | seconds |
 | `photonAddressCacheTtl` | `86400` | seconds, `0` disables the cache |
 | `photonAddressLayers` | `[]` | e.g. `['house','street']` for address-only results |
+| `photonAddressBiasZoom` | `12` | OSM zoom level of the location bias (1–18), 12 ≈ city scale |
+| `photonAddressBiasScale` | `0.4` | weight of the location bias (0–1), Photon default 0.2 |
 
 ## Response format
 

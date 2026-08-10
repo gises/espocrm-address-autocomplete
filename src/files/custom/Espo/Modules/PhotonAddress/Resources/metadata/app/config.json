@@ -7,6 +7,8 @@
         "photonAddressTimeout": {"level": "admin"},
         "photonAddressCacheTtl": {"level": "admin"},
         "photonAddressLayers": {"level": "admin"},
+        "photonAddressBiasZoom": {"level": "admin"},
+        "photonAddressBiasScale": {"level": "admin"},
         "photonAddressCountryCodesMigrated": {"level": "system"}
     }
 }

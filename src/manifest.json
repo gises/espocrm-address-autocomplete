@@ -1,6 +1,6 @@
 {
     "name": "Photon Address Autocomplete",
-    "version": "1.3.2",
+    "version": "1.4.0",
     "acceptableVersions": [
         "^10.0"
     ],
