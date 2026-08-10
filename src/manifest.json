@@ -1,6 +1,6 @@
 {
     "name": "Photon Address Autocomplete (DACH)",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "acceptableVersions": [
         "^10.0"
     ],

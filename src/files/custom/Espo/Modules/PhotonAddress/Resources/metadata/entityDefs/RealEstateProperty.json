@@ -1,0 +1,7 @@
+{
+    "fields": {
+        "address": {
+            "view": "photon-address:views/fields/address-autocomplete"
+        }
+    }
+}

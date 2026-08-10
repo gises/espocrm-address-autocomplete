@@ -24,12 +24,34 @@ class SearchService
     ) {}
 
     /**
+     * @param array{city?: string, zip?: string, country?: string} $context
+     *        Bereits ausgefuellte Subfelder des Adressformulars.
      * @return array<int, array<string, mixed>>
      */
-    public function search(string $q, ?int $limitOverride = null): array
+    public function search(string $q, ?int $limitOverride = null, array $context = []): array
     {
         $limit = $this->photonConfig->getLimit($limitOverride);
-        $cacheKey = $this->buildCacheKey($q, $limit);
+        $context = $this->normalizeContext($context);
+
+        $results = $this->doSearch($q, $limit, $context);
+
+        // Der Kontext kann zu praezise sein (von Hand editierter Ort,
+        // widerspruechliche Eingaben). Dann lieber breit suchen als dem
+        // Nutzer eine leere Liste zeigen.
+        if ($results === [] && $context !== []) {
+            $results = $this->doSearch($q, $limit, []);
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param array<string, string> $context
+     * @return array<int, array<string, mixed>>
+     */
+    private function doSearch(string $q, int $limit, array $context): array
+    {
+        $cacheKey = $this->buildCacheKey($q, $limit, $context);
 
         $cached = $this->readCache($cacheKey);
 
@@ -42,7 +64,7 @@ class SearchService
             // der defensive Laenderfilter und die Deduplizierung koennen
             // Eintraege entfernen. Bei limit=5 direkt an Photon koennte
             // sonst eine leere Liste zurueckkommen.
-            $features = $this->client->search($q, min($limit * 3, 20));
+            $features = $this->client->search($this->buildPhotonQuery($q, $context), min($limit * 3, 20));
         }
         catch (Throwable $e) {
             $this->log->error('PhotonAddress: ' . $e->getMessage());
@@ -59,7 +81,7 @@ class SearchService
         foreach ($features as $feature) {
             $item = $this->mapper->map($feature, $countryCodes);
 
-            if ($item === null) {
+            if ($item === null || !$this->matchesContext($item, $context)) {
                 continue;
             }
 
@@ -82,11 +104,89 @@ class SearchService
         return $results;
     }
 
-    private function buildCacheKey(string $q, int $limit): string
+    /**
+     * Photon kennt auf der oeffentlichen Instanz keine strukturierte Suche;
+     * der Kontext wird deshalb als Volltext an die Query gehaengt und
+     * hebt Treffer aus dem richtigen Ort ueber das Ranking nach oben.
+     *
+     * @param array<string, string> $context
+     */
+    private function buildPhotonQuery(string $q, array $context): string
+    {
+        $parts = [$q];
+
+        $zipCity = trim(($context['zip'] ?? '') . ' ' . ($context['city'] ?? ''));
+
+        if ($zipCity !== '') {
+            $parts[] = $zipCity;
+        }
+
+        if (($context['country'] ?? '') !== '') {
+            $parts[] = $context['country'];
+        }
+
+        return implode(', ', $parts);
+    }
+
+    /**
+     * Zweite Verteidigungslinie zum Query-Ranking: Treffer aus dem
+     * falschen Ort bzw. Land fliegen raus. Der Vergleich ist exakt
+     * (case-insensitiv) - Autofill schreibt und Photon liefert dieselbe
+     * Sprache (lang-Parameter), daher passt "Italien" zu "Italien".
+     * Auf die PLZ wird bewusst nicht gefiltert: Strassenzuege koennen
+     * mehrere PLZ tragen.
+     *
+     * @param array<string, mixed> $item
+     * @param array<string, string> $context
+     */
+    private function matchesContext(array $item, array $context): bool
+    {
+        foreach (['city' => 'city', 'country' => 'country'] as $contextKey => $itemKey) {
+            $expected = $context[$contextKey] ?? '';
+            $actual = $item[$itemKey] ?? null;
+
+            if ($expected === '' || !is_string($actual)) {
+                continue;
+            }
+
+            if (mb_strtolower($actual) !== mb_strtolower($expected)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, string>
+     */
+    private function normalizeContext(array $context): array
+    {
+        $normalized = [];
+
+        foreach (['city', 'zip', 'country'] as $key) {
+            $value = trim((string) ($context[$key] ?? ''));
+
+            if ($value !== '') {
+                $normalized[$key] = $value;
+            }
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @param array<string, string> $context
+     */
+    private function buildCacheKey(string $q, int $limit, array $context): string
     {
         return sha1(implode('|', [
             mb_strtolower($q),
             $limit,
+            mb_strtolower($context['city'] ?? ''),
+            mb_strtolower($context['zip'] ?? ''),
+            mb_strtolower($context['country'] ?? ''),
             $this->photonConfig->getLang(),
             implode(',', $this->photonConfig->getCountryCodes()),
             implode(',', $this->photonConfig->getLayers()),

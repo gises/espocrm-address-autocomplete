@@ -44,7 +44,16 @@ Dinge mit:
    GET https://<crm>/api/v1/PhotonAddress/search?q=Bahnhofstrasse%208001
    ```
 
-Aktiv auf Account (Rechnungs- und Lieferadresse), Contact und Lead.
+Aktiv auf Account (Rechnungs- und Lieferadresse), Contact, Lead sowie –
+falls die Real-Estate-Extension installiert ist – RealEstateProperty
+(Feld `address`). Die Registrierung für nicht installierte Entitäten ist
+wirkungslos und stört nicht.
+
+Bereits ausgefüllte Subfelder (Ort, PLZ, Land) engen die Strassensuche
+ein: Sie fliessen serverseitig in die Photon-Query ein, und Treffer aus
+dem falschen Ort bzw. Land werden verworfen. Liefert die eingeschränkte
+Suche nichts (z. B. bei von Hand editiertem, widersprüchlichem Ort),
+wird einmal breit ohne Kontext nachgesucht.
 
 Weitere Adressfelder aktivieren – `custom/Espo/Custom/Resources/metadata/entityDefs/<Entity>.json`:
 

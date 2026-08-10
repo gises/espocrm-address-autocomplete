@@ -3,6 +3,23 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.2.0] – 2026-08-10
+
+### Neu
+
+- Bereits ausgefüllte Subfelder (Ort, PLZ, Land) engen die Strassensuche
+  ein. Das Frontend schickt sie als `city`, `zip` und `country` an den
+  Endpoint; der Server hängt sie an die Photon-Query an (Volltext-Ranking)
+  und verwirft zusätzlich Treffer aus dem falschen Ort bzw. Land
+  (exakter, case-insensitiver Vergleich – Autofill und Photon liefern
+  dieselbe Sprache). Auf die PLZ wird bewusst nicht gefiltert, da
+  Strassenzüge mehrere PLZ tragen können. Liefert die eingeschränkte
+  Suche nichts, wird einmal breit ohne Kontext nachgesucht. Der
+  Cache-Key berücksichtigt den Kontext.
+- Autocomplete auch auf der Entität `RealEstateProperty` (Feld `address`)
+  der Real-Estate-Extension. Ist die Extension nicht installiert, bleibt
+  die Registrierung wirkungslos.
+
 ## [1.1.0] – 2026-08-10
 
 ### Neu

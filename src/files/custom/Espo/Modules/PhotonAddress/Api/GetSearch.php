@@ -11,13 +11,16 @@ use Espo\Core\Api\ResponseComposer;
 use Espo\Modules\PhotonAddress\Tools\Photon\SearchService;
 
 /**
- * GET /api/v1/PhotonAddress/search?q=...
+ * GET /api/v1/PhotonAddress/search?q=...&city=...&zip=...&country=...
  *
  * Serverseitiger Proxy fuer die Photon-Geocoding-API (OpenStreetMap).
  * Die Route ist ueber die regulaere EspoCRM-Authentifizierung geschuetzt,
  * d. h. nur eingeloggte Nutzer bzw. gueltige API-Keys koennen sie aufrufen.
  * Dadurch entfaellt jede CORS-Konfiguration (Same-Origin) und der Proxy
  * kann nicht als offener Relay missbraucht werden.
+ *
+ * city, zip und country sind optionaler Kontext aus bereits ausgefuellten
+ * Subfeldern des Adressformulars; sie engen die Suche ein.
  *
  * Antwort: flaches JSON-Array mit den Keys
  * label, street, zip, city, state, country, countryCode, lat, lon, osmId.
@@ -26,6 +29,7 @@ class GetSearch implements Action
 {
     private const int MIN_QUERY_LENGTH = 3;
     private const int MAX_QUERY_LENGTH = 150;
+    private const int MAX_CONTEXT_LENGTH = 100;
 
     public function __construct(
         private readonly SearchService $searchService
@@ -50,7 +54,17 @@ class GetSearch implements Action
         $limitParam = $request->getQueryParam('limit');
         $limit = is_numeric($limitParam) ? (int) $limitParam : null;
 
-        $results = $this->searchService->search($q, $limit);
+        $context = [];
+
+        foreach (['city', 'zip', 'country'] as $key) {
+            $value = trim((string) ($request->getQueryParam($key) ?? ''));
+
+            if ($value !== '') {
+                $context[$key] = mb_substr($value, 0, self::MAX_CONTEXT_LENGTH);
+            }
+        }
+
+        $results = $this->searchService->search($q, $limit, $context);
 
         return ResponseComposer::json($results);
     }

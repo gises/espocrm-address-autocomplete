@@ -100,7 +100,7 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
                 return Promise.resolve([]);
             }
 
-            return Ajax.getRequest('PhotonAddress/search', {q: term})
+            return Ajax.getRequest('PhotonAddress/search', this.buildSearchParams(term))
                 .then(response => {
                     if (!Array.isArray(response)) {
                         return [];
@@ -121,6 +121,34 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
 
                     return [];
                 });
+        }
+
+        /**
+         * Bereits ausgefuellte Subfelder (Ort, PLZ, Land) engen die
+         * Strassensuche serverseitig ein. Die Werte kommen aus dem DOM,
+         * nicht aus dem Model - gleiche Begruendung wie in applySuggestion().
+         *
+         * @param {string} term
+         * @return {Object<string, string>}
+         */
+        buildSearchParams(term) {
+            const params = {q: term};
+
+            const contextFields = {
+                city: this.cityField,
+                zip: this.postalCodeField,
+                country: this.countryField,
+            };
+
+            Object.keys(contextFields).forEach(key => {
+                const value = (this.$el.find(`[data-name="${contextFields[key]}"]`).val() || '').trim();
+
+                if (value !== '') {
+                    params[key] = value;
+                }
+            });
+
+            return params;
         }
 
         /**
