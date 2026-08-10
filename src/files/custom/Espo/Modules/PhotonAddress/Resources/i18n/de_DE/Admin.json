@@ -1,0 +1,11 @@
+{
+    "labels": {
+        "Photon Address Autocomplete": "Photon Address Autocomplete"
+    },
+    "descriptions": {
+        "photonAddress": "Einstellungen des Adress-Autocomplete: teilnehmende Länder, Photon-Endpoint, Sprache."
+    },
+    "keywords": {
+        "photonAddress": "adresse,autocomplete,photon,geocoding,länder"
+    }
+}

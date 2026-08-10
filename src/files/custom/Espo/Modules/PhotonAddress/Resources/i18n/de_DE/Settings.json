@@ -1,0 +1,12 @@
+{
+    "fields": {
+        "photonAddressCountryCodes": "Länder-Override",
+        "photonAddressUrl": "Photon-Endpoint-URL",
+        "photonAddressLang": "Sprache der Treffer"
+    },
+    "tooltips": {
+        "photonAddressCountryCodes": "ISO-3166-1-alpha-2-Codes, z. B. ch, de, at.\n\nLeer lassen, um die bevorzugten Länder aus Administration → Adresse Länder zu verwenden. Sind auch dort keine Länder bevorzugt, gilt der Fallback ch, de, at.",
+        "photonAddressUrl": "Leer lassen für die öffentliche Instanz https://photon.komoot.io/api/ (ohne SLA). Für den Produktivbetrieb auf eine eigene Photon-Instanz zeigen lassen.",
+        "photonAddressLang": "Zweistelliger Sprachcode für die Treffer-Labels, z. B. de, en, fr. Default: de."
+    }
+}

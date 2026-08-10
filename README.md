@@ -52,11 +52,11 @@ if the Real Estate extension is installed — RealEstateProperty (field
 `address`). The registration for entities that are not installed has no
 effect and does no harm.
 
-Already filled sub-fields (city, postal code, country) narrow the street
-search: they are fed into the Photon query server-side, and results from
-the wrong city or country are discarded. If the narrowed search returns
-nothing (e.g. a manually edited, contradictory city), one broad search
-without context is performed.
+Already filled sub-fields (city, postal code, country) guide the street
+search: they are fed into the Photon query server-side, and results
+matching the entered city or country are ranked first — results from
+other places remain selectable below. If the contextual search returns
+nothing, one broad search without context is performed.
 
 To enable further address fields —
 `custom/Espo/Custom/Resources/metadata/entityDefs/<Entity>.json`:
@@ -80,10 +80,15 @@ standard list under **Administration → Address Countries**: every entry
 with the **"Is Preferred"** flag is passed to Photon as a `countrycode`
 filter. Order of evaluation:
 
-1. `photonAddressCountryCodes` in `data/config.php` — manual override,
-   supersedes the admin list (normally not set).
+1. `photonAddressCountryCodes` — manual override, supersedes the admin
+   list. Editable on the settings page
+   **Administration → Photon Address Autocomplete** (or in
+   `data/config.php`); leave empty to use the standard list.
 2. Preferred countries from **Administration → Address Countries**.
 3. Fallback `['ch','de','at']` if no countries are preferred.
+
+The settings page also exposes the Photon endpoint URL (for
+self-hosting) and the result language.
 
 The search cache includes the country list in its cache key; after
 changing the preferred countries, new searches take effect immediately.

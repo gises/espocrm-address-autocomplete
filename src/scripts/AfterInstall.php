@@ -47,8 +47,16 @@ class AfterInstall
         // in die Config geschrieben. Genau dieser unveraenderte Default
         // wird entfernt, damit die Adminliste greift. Ein vom Admin
         // bewusst gesetzter (abweichender) Wert bleibt bestehen.
-        if ($config->get('photonAddressCountryCodes') === ['ch', 'de', 'at']) {
-            $configWriter->remove('photonAddressCountryCodes');
+        //
+        // Laeuft nur ein einziges Mal (Marker-Flag): seit es die
+        // Admin-Seite gibt, kann ch/de/at auch eine bewusste Eingabe
+        // sein - die darf ein spaeteres Update nicht mehr wegraeumen.
+        if ($config->get('photonAddressCountryCodesMigrated') === null) {
+            if ($config->get('photonAddressCountryCodes') === ['ch', 'de', 'at']) {
+                $configWriter->remove('photonAddressCountryCodes');
+            }
+
+            $configWriter->set('photonAddressCountryCodesMigrated', true);
             $isChanged = true;
         }
 

@@ -81,7 +81,7 @@ class SearchService
         foreach ($features as $feature) {
             $item = $this->mapper->map($feature, $countryCodes);
 
-            if ($item === null || !$this->matchesContext($item, $context)) {
+            if ($item === null) {
                 continue;
             }
 
@@ -93,11 +93,23 @@ class SearchService
 
             $seen[$signature] = true;
             $results[] = $item;
-
-            if (count($results) >= $limit) {
-                break;
-            }
         }
+
+        if ($context !== []) {
+            // Der Kontext gewichtet, statt zu filtern: Treffer aus dem
+            // eingegebenen Ort bzw. Land stehen oben, abweichende bleiben
+            // aber waehlbar - wer trotz gefuelltem Ort eine Adresse
+            // anderswo sucht, bekommt sie weiterhin angeboten.
+            // usort ist seit PHP 8.0 stabil, die Photon-Reihenfolge
+            // bleibt innerhalb gleicher Gewichtung erhalten.
+            usort(
+                $results,
+                fn (array $a, array $b) =>
+                    $this->contextScore($b, $context) <=> $this->contextScore($a, $context)
+            );
+        }
+
+        $results = array_slice($results, 0, $limit);
 
         $this->writeCache($cacheKey, $results);
 
@@ -129,32 +141,34 @@ class SearchService
     }
 
     /**
-     * Zweite Verteidigungslinie zum Query-Ranking: Treffer aus dem
-     * falschen Ort bzw. Land fliegen raus. Der Vergleich ist exakt
-     * (case-insensitiv) - Autofill schreibt und Photon liefert dieselbe
-     * Sprache (lang-Parameter), daher passt "Italien" zu "Italien".
-     * Auf die PLZ wird bewusst nicht gefiltert: Strassenzuege koennen
+     * Gewicht eines Treffers relativ zum Formularkontext: Ort zaehlt
+     * staerker als Land. Der Vergleich ist exakt (case-insensitiv) -
+     * Autofill schreibt und Photon liefert dieselbe Sprache
+     * (lang-Parameter), daher passt "Italien" zu "Italien". Die PLZ
+     * geht bewusst nicht ins Gewicht ein: Strassenzuege koennen
      * mehrere PLZ tragen.
      *
      * @param array<string, mixed> $item
      * @param array<string, string> $context
      */
-    private function matchesContext(array $item, array $context): bool
+    private function contextScore(array $item, array $context): int
     {
-        foreach (['city' => 'city', 'country' => 'country'] as $contextKey => $itemKey) {
-            $expected = $context[$contextKey] ?? '';
-            $actual = $item[$itemKey] ?? null;
+        $score = 0;
 
-            if ($expected === '' || !is_string($actual)) {
-                continue;
-            }
+        foreach (['city' => 2, 'country' => 1] as $key => $weight) {
+            $expected = $context[$key] ?? '';
+            $actual = $item[$key] ?? null;
 
-            if (mb_strtolower($actual) !== mb_strtolower($expected)) {
-                return false;
+            if (
+                $expected !== ''
+                && is_string($actual)
+                && mb_strtolower($actual) === mb_strtolower($expected)
+            ) {
+                $score += $weight;
             }
         }
 
-        return true;
+        return $score;
     }
 
     /**

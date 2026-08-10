@@ -50,11 +50,11 @@ falls die Real-Estate-Extension installiert ist – RealEstateProperty
 (Feld `address`). Die Registrierung für nicht installierte Entitäten ist
 wirkungslos und stört nicht.
 
-Bereits ausgefüllte Subfelder (Ort, PLZ, Land) engen die Strassensuche
-ein: Sie fliessen serverseitig in die Photon-Query ein, und Treffer aus
-dem falschen Ort bzw. Land werden verworfen. Liefert die eingeschränkte
-Suche nichts (z. B. bei von Hand editiertem, widersprüchlichem Ort),
-wird einmal breit ohne Kontext nachgesucht.
+Bereits ausgefüllte Subfelder (Ort, PLZ, Land) lenken die Strassensuche:
+Sie fliessen serverseitig in die Photon-Query ein, und Treffer aus dem
+eingegebenen Ort bzw. Land stehen oben — abweichende Treffer bleiben
+darunter wählbar. Liefert die Kontext-Suche nichts, wird einmal breit
+ohne Kontext nachgesucht.
 
 Weitere Adressfelder aktivieren – `custom/Espo/Custom/Resources/metadata/entityDefs/<Entity>.json`:
 
@@ -77,10 +77,15 @@ Welche Länder am Autocomplete teilnehmen, steuert die Standardliste unter
 **«Wird bevorzugt»** werden als `countrycode`-Filter an Photon übergeben.
 Reihenfolge der Auswertung:
 
-1. `photonAddressCountryCodes` in `data/config.php` — manueller Override,
-   übersteuert die Adminliste (normalerweise nicht setzen).
+1. `photonAddressCountryCodes` — manueller Override, übersteuert die
+   Adminliste. Editierbar auf der Einstellungsseite
+   **Administration → Photon Address Autocomplete** (oder in
+   `data/config.php`); leer lassen, um die Standardliste zu verwenden.
 2. Bevorzugte Länder aus **Administration → Adresse Länder**.
 3. Fallback `['ch','de','at']`, falls keine Länder bevorzugt sind.
+
+Die Einstellungsseite bietet zusätzlich die Photon-Endpoint-URL
+(Self-Hosting) und die Sprache der Treffer an.
 
 Der Suchcache berücksichtigt die Länderliste im Cache-Key; nach einer
 Änderung der bevorzugten Länder greifen neue Suchen sofort.

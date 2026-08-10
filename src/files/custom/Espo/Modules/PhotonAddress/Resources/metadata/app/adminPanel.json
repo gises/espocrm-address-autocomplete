@@ -1,0 +1,15 @@
+{
+    "photonAddress": {
+        "label": "Photon Address Autocomplete",
+        "itemList": [
+            {
+                "url": "#Admin/photonAddress",
+                "label": "Photon Address Autocomplete",
+                "iconClass": "fas fa-map-marker-alt",
+                "description": "photonAddress",
+                "recordView": "photon-address:views/admin/photon-address-settings"
+            }
+        ],
+        "order": 200
+    }
+}

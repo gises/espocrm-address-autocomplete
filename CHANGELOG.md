@@ -3,6 +3,43 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.3.0] – 2026-08-10
+
+### Neu
+
+- Einstellungsseite **Administration → Photon Address Autocomplete**
+  (Deutsch und Englisch übersetzt) mit drei Feldern:
+  **Länder-Override** (Array; leer = bevorzugte Länder aus der
+  Standardliste, Fallback ch/de/at), **Photon-Endpoint-URL**
+  (Self-Hosting) und **Sprache der Treffer**. Kein Handanlegen an
+  `data/config.php` mehr nötig. Umgesetzt über den generischen
+  `adminPanel`-Mechanismus (`recordView` + Route `Admin/:page`).
+- Alle `photonAddress*`-Config-Parameter sind als `level: admin`
+  deklariert und tauchen damit nicht mehr in der Frontend-Config
+  regulärer Benutzer auf.
+
+### Geändert
+
+- Der Formularkontext (Ort/Land) **gewichtet** die Treffer nur noch,
+  statt zu filtern: Passende Treffer stehen oben (Ort zählt stärker
+  als Land), abweichende bleiben darunter wählbar. Wer trotz
+  gefülltem Ort eine Adresse anderswo sucht, bekommt sie weiterhin
+  angeboten.
+- Die 1.0.x-Migration (Entfernen des alten Auto-Defaults ch/de/at)
+  läuft nur noch ein einziges Mal (Marker-Flag
+  `photonAddressCountryCodesMigrated`). Ein über die neue
+  Einstellungsseite bewusst gesetztes ch/de/at überlebt damit
+  künftige Updates.
+
+### Behoben
+
+- Der Breitenfix aus 1.2.1 griff nicht: devbridge setzt die
+  Container-Breite auch in `fixPosition()` **nach** dem
+  `beforeRender`-Hook (und bei jedem window-resize) erneut fest auf
+  die Feldbreite. Jetzt gewinnt eine Stylesheet-Regel mit
+  `width: auto !important`; die Feldbreite bleibt als `min-width`
+  erhalten.
+
 ## [1.2.1] – 2026-08-10
 
 ### Behoben

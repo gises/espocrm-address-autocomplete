@@ -1,0 +1,12 @@
+{
+    "fields": {
+        "photonAddressCountryCodes": "Country Override",
+        "photonAddressUrl": "Photon Endpoint URL",
+        "photonAddressLang": "Result Language"
+    },
+    "tooltips": {
+        "photonAddressCountryCodes": "ISO 3166-1 alpha-2 codes, e.g. ch, de, at.\n\nLeave empty to use the preferred countries from Administration → Address Countries. If no countries are preferred there either, the fallback ch, de, at applies.",
+        "photonAddressUrl": "Leave empty for the public instance https://photon.komoot.io/api/ (no SLA). For production use, point this to a self-hosted Photon instance.",
+        "photonAddressLang": "Two-letter language code for result labels, e.g. de, en, fr. Default: de."
+    }
+}

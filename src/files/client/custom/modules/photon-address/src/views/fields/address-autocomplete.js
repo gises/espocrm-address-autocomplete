@@ -125,28 +125,54 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
         }
 
         /**
-         * devbridge-autocomplete setzt die Container-Breite bei jedem
-         * suggest() fix auf die Breite des Strassenfelds; die Labels
-         * (Strasse - PLZ Ort (Kanton), Land) sind dafuer regelmaessig zu
-         * lang und werden vom Theme abgeschnitten (white-space: nowrap,
-         * overflow: hidden). Die Feldbreite bleibt als Untergrenze, nach
-         * oben darf der Container mit dem Inhalt wachsen - beforeRender
-         * laeuft nach adjustContainerWidth() und gewinnt daher.
+         * devbridge-autocomplete setzt die Container-Breite zweimal pro
+         * Anzeige fest auf die Breite des Strassenfelds: in
+         * adjustContainerWidth() VOR beforeRender und in fixPosition()
+         * DANACH (sowie bei jedem window-resize). Ein Inline-Stil aus
+         * beforeRender wird dadurch sofort wieder ueberschrieben - nur
+         * eine !important-Regel aus einem Stylesheet gewinnt gegen die
+         * per .css() gesetzte Inline-Breite. Die Feldbreite bleibt als
+         * min-width erhalten (die ruehrt devbridge nicht an), nach oben
+         * waechst der Container mit dem Inhalt bis knapp an den
+         * Viewport-Rand.
          *
          * @param {HTMLElement} container
          */
         adjustSuggestionContainer(container) {
+            this.ensureSuggestionStyle();
+
+            container.classList.add('photon-address-suggestions');
+
             if (container.style.width && container.style.width !== 'auto') {
                 container.style.minWidth = container.style.width;
             }
-
-            container.style.width = 'auto';
-            container.style.maxWidth = 'calc(100vw - 30px)';
         }
 
         /**
-         * Bereits ausgefuellte Subfelder (Ort, PLZ, Land) engen die
-         * Strassensuche serverseitig ein. Die Werte kommen aus dem DOM,
+         * Legt die Stylesheet-Regel einmalig pro Dokument an.
+         */
+        ensureSuggestionStyle() {
+            const id = 'photon-address-suggestions-style';
+
+            if (document.getElementById(id)) {
+                return;
+            }
+
+            const style = document.createElement('style');
+
+            style.id = id;
+            style.textContent =
+                '.autocomplete-suggestions.photon-address-suggestions {' +
+                ' width: auto !important;' +
+                ' max-width: calc(100vw - 30px);' +
+                '}';
+
+            document.head.appendChild(style);
+        }
+
+        /**
+         * Bereits ausgefuellte Subfelder (Ort, PLZ, Land) gewichten die
+         * Strassensuche serverseitig. Die Werte kommen aus dem DOM,
          * nicht aus dem Model - gleiche Begruendung wie in applySuggestion().
          *
          * @param {string} term

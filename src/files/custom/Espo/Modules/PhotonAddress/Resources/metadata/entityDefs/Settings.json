@@ -1,0 +1,20 @@
+{
+    "fields": {
+        "photonAddressCountryCodes": {
+            "type": "array",
+            "noEmptyString": true,
+            "displayAsList": true,
+            "tooltip": true
+        },
+        "photonAddressUrl": {
+            "type": "url",
+            "strip": true,
+            "tooltip": true
+        },
+        "photonAddressLang": {
+            "type": "varchar",
+            "maxLength": 2,
+            "tooltip": true
+        }
+    }
+}

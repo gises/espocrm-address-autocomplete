@@ -1,0 +1,12 @@
+{
+    "params": {
+        "photonAddressUrl": {"level": "admin"},
+        "photonAddressCountryCodes": {"level": "admin"},
+        "photonAddressLang": {"level": "admin"},
+        "photonAddressLimit": {"level": "admin"},
+        "photonAddressTimeout": {"level": "admin"},
+        "photonAddressCacheTtl": {"level": "admin"},
+        "photonAddressLayers": {"level": "admin"},
+        "photonAddressCountryCodesMigrated": {"level": "system"}
+    }
+}
