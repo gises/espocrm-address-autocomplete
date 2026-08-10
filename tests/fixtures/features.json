@@ -1,0 +1,97 @@
+[
+  {
+    "geometry": {
+      "coordinates": [
+        8.5401,
+        47.3739
+      ],
+      "type": "Point"
+    },
+    "properties": {
+      "osm_id": 1,
+      "osm_key": "place",
+      "osm_value": "house",
+      "osm_type": "N",
+      "countrycode": "CH",
+      "postcode": "8001",
+      "city": "Zürich",
+      "street": "Bahnhofstrasse",
+      "housenumber": "8",
+      "state": "Zürich",
+      "country": "Schweiz",
+      "type": "house"
+    }
+  },
+  {
+    "geometry": {
+      "coordinates": [
+        13.377,
+        52.516
+      ],
+      "type": "Point"
+    },
+    "properties": {
+      "osm_id": 2,
+      "osm_key": "place",
+      "osm_value": "city",
+      "countrycode": "DE",
+      "name": "Berlin",
+      "state": "Berlin",
+      "country": "Deutschland",
+      "postcode": "10117",
+      "type": "city"
+    }
+  },
+  {
+    "geometry": {
+      "coordinates": [
+        16.37,
+        48.2
+      ],
+      "type": "Point"
+    },
+    "properties": {
+      "osm_id": 3,
+      "osm_key": "highway",
+      "osm_value": "residential",
+      "countrycode": "AT",
+      "name": "Kärntner Straße",
+      "city": "Wien",
+      "state": "Wien",
+      "country": "Österreich",
+      "postcode": "1010"
+    }
+  },
+  {
+    "geometry": {
+      "coordinates": [
+        2.35,
+        48.85
+      ],
+      "type": "Point"
+    },
+    "properties": {
+      "osm_id": 4,
+      "countrycode": "FR",
+      "name": "Rue de Rivoli",
+      "city": "Paris",
+      "state": "Île-de-France",
+      "country": "Frankreich",
+      "postcode": "75001"
+    }
+  },
+  {
+    "geometry": {
+      "coordinates": [
+        0,
+        0
+      ],
+      "type": "Point"
+    },
+    "properties": {
+      "osm_id": 5,
+      "countrycode": "DE",
+      "name": "Nirgendwo"
+    }
+  }
+]

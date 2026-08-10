@@ -1,0 +1,10 @@
+{
+    "fields": {
+        "billingAddress": {
+            "view": "photon-address:views/fields/address-autocomplete"
+        },
+        "shippingAddress": {
+            "view": "photon-address:views/fields/address-autocomplete"
+        }
+    }
+}

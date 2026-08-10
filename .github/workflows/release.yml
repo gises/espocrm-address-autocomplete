@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP einrichten
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, json, mbstring
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Tests
+        run: bash tests/run.sh
+
+      - name: Tag-Version gegen manifest.json pruefen
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          MANIFEST=$(node -e 'process.stdout.write(require("./src/manifest.json").version)')
+          if [ "$TAG" != "$MANIFEST" ]; then
+            echo "Tag ($TAG) und manifest.json ($MANIFEST) stimmen nicht ueberein." >&2
+            exit 1
+          fi
+
+      - name: Paket bauen
+        run: bash build.sh
+
+      - name: Release veroeffentlichen
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.zip
+          generate_release_notes: true

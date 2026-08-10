@@ -1,0 +1,7 @@
+[
+    {
+        "route": "/PhotonAddress/search",
+        "method": "get",
+        "actionClassName": "Espo\\Modules\\PhotonAddress\\Api\\GetSearch"
+    }
+]
