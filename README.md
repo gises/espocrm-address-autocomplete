@@ -1,104 +1,108 @@
-# Photon Address Autocomplete (DACH) für EspoCRM
+# Photon Address Autocomplete for EspoCRM
 
-Adress-Autocomplete für Schweiz, Deutschland und Österreich – direkt im
-Adressfeld von EspoCRM, auf Basis der Open-Source-Geocoding-Engine
-[Photon](https://github.com/komoot/photon) (OpenStreetMap-Daten).
+**English** · [Deutsch](README.de.md)
 
-Tippen im Straßenfeld, Treffer anklicken – Straße, PLZ, Ort,
-Kanton/Bundesland und Land werden gemeinsam gesetzt.
+Address autocomplete directly inside EspoCRM address fields, backed by the
+open-source geocoding engine [Photon](https://github.com/komoot/photon)
+(OpenStreetMap data).
 
-> *English:* Address autocomplete for Austria, Germany and Switzerland in
-> EspoCRM, backed by the Photon geocoder. Documentation is in German.
+Type in the street field, click a suggestion — street, postal code, city,
+state and country are filled in together. Which countries participate is
+controlled by EspoCRM's standard country list (preferred countries);
+without any selection the extension defaults to Switzerland, Germany and
+Austria.
 
-**Zielversion: EspoCRM 10.x · PHP 8.3–8.5 · keine Composer- oder
-NPM-Abhängigkeiten.**
+**Target version: EspoCRM 10.x · PHP 8.3–8.5 · no Composer or NPM
+dependencies.**
 
 ---
 
-## Warum ein eigener Proxy?
+## Why a server-side proxy?
 
-Das Frontend spricht **nicht** direkt mit `photon.komoot.io`, sondern mit
-einer eigenen Route unter `/api/v1/PhotonAddress/search`. Das bringt drei
-Dinge mit:
+The frontend does **not** talk to `photon.komoot.io` directly but to a
+dedicated route at `/api/v1/PhotonAddress/search`. This brings three
+things:
 
-- **Kein CORS.** Same-Origin-Request innerhalb von EspoCRM.
-- **Authentifiziert.** Die Route hängt an der regulären Espo-Session; der
-  Proxy lässt sich nicht als offenes Relay auf Kosten der öffentlichen
-  Photon-Instanz missbrauchen.
-- **Cache und Filter serverseitig.** Autocomplete erzeugt sonst pro
-  getipptem Zeichen einen Request nach außen.
+- **No CORS.** Same-origin request within EspoCRM.
+- **Authenticated.** The route is protected by the regular Espo session;
+  the proxy cannot be abused as an open relay at the expense of the
+  public Photon instance.
+- **Server-side cache and filtering.** Autocomplete would otherwise fire
+  one outbound request per typed character.
 
 ## Installation
 
-1. ZIP aus den [Releases](../../releases) laden – oder selbst bauen:
+1. Download the ZIP from the [releases](../../releases) — or build it
+   yourself:
 
    ```bash
    ./build.sh          # -> build/photon-address-autocomplete-<version>.zip
    ```
 
-2. In EspoCRM: **Administration → Extensions → ZIP hochladen → Install**
+2. In EspoCRM: **Administration → Extensions → Upload ZIP → Install**
 3. **Administration → Clear Cache**
-4. Prüfen (eingeloggt im Browser):
+4. Verify (logged in, in the browser):
 
    ```
    GET https://<crm>/api/v1/PhotonAddress/search?q=Bahnhofstrasse%208001
    ```
 
-Aktiv auf Account (Rechnungs- und Lieferadresse), Contact, Lead sowie –
-falls die Real-Estate-Extension installiert ist – RealEstateProperty
-(Feld `address`). Die Registrierung für nicht installierte Entitäten ist
-wirkungslos und stört nicht.
+Active on Account (billing and shipping address), Contact, Lead and —
+if the Real Estate extension is installed — RealEstateProperty (field
+`address`). The registration for entities that are not installed has no
+effect and does no harm.
 
-Bereits ausgefüllte Subfelder (Ort, PLZ, Land) engen die Strassensuche
-ein: Sie fliessen serverseitig in die Photon-Query ein, und Treffer aus
-dem falschen Ort bzw. Land werden verworfen. Liefert die eingeschränkte
-Suche nichts (z. B. bei von Hand editiertem, widersprüchlichem Ort),
-wird einmal breit ohne Kontext nachgesucht.
+Already filled sub-fields (city, postal code, country) narrow the street
+search: they are fed into the Photon query server-side, and results from
+the wrong city or country are discarded. If the narrowed search returns
+nothing (e.g. a manually edited, contradictory city), one broad search
+without context is performed.
 
-Weitere Adressfelder aktivieren – `custom/Espo/Custom/Resources/metadata/entityDefs/<Entity>.json`:
+To enable further address fields —
+`custom/Espo/Custom/Resources/metadata/entityDefs/<Entity>.json`:
 
 ```json
 {
     "fields": {
-        "meinAdressFeld": {
+        "myAddressField": {
             "view": "photon-address:views/fields/address-autocomplete"
         }
     }
 }
 ```
 
-## Konfiguration
+## Configuration
 
-### Länderauswahl
+### Country selection
 
-Welche Länder am Autocomplete teilnehmen, steuert die Standardliste unter
-**Administration → Adresse Länder**: alle Einträge mit dem Flag
-**«Wird bevorzugt»** werden als `countrycode`-Filter an Photon übergeben.
-Reihenfolge der Auswertung:
+Which countries participate in the autocomplete is controlled by the
+standard list under **Administration → Address Countries**: every entry
+with the **"Is Preferred"** flag is passed to Photon as a `countrycode`
+filter. Order of evaluation:
 
-1. `photonAddressCountryCodes` in `data/config.php` — manueller Override,
-   übersteuert die Adminliste (normalerweise nicht setzen).
-2. Bevorzugte Länder aus **Administration → Adresse Länder**.
-3. Fallback `['ch','de','at']`, falls keine Länder bevorzugt sind.
+1. `photonAddressCountryCodes` in `data/config.php` — manual override,
+   supersedes the admin list (normally not set).
+2. Preferred countries from **Administration → Address Countries**.
+3. Fallback `['ch','de','at']` if no countries are preferred.
 
-Der Suchcache berücksichtigt die Länderliste im Cache-Key; nach einer
-Änderung der bevorzugten Länder greifen neue Suchen sofort.
+The search cache includes the country list in its cache key; after
+changing the preferred countries, new searches take effect immediately.
 
-### Parameter in `data/config.php`
+### Parameters in `data/config.php`
 
-Optional; ohne Eintrag gelten die Defaults.
+Optional; without an entry the defaults apply.
 
-| Parameter | Default | Bedeutung |
-|-----------|---------|-----------|
-| `photonAddressUrl` | `https://photon.komoot.io/api/` | Endpoint, für Self-Hosting ändern |
-| `photonAddressCountryCodes` | – (Adminliste) | manueller Länder-Override, s. o. |
-| `photonAddressLang` | `de` | Sprache der Bezeichnungen |
-| `photonAddressLimit` | `5` | ausgelieferte Treffer |
-| `photonAddressTimeout` | `4` | Sekunden |
-| `photonAddressCacheTtl` | `86400` | Sekunden, `0` schaltet den Cache ab |
-| `photonAddressLayers` | `[]` | z. B. `['house','street']` für reine Adresstreffer |
+| Parameter | Default | Meaning |
+|-----------|---------|---------|
+| `photonAddressUrl` | `https://photon.komoot.io/api/` | endpoint, change for self-hosting |
+| `photonAddressCountryCodes` | – (admin list) | manual country override, see above |
+| `photonAddressLang` | `de` | language of the labels |
+| `photonAddressLimit` | `5` | delivered results |
+| `photonAddressTimeout` | `4` | seconds |
+| `photonAddressCacheTtl` | `86400` | seconds, `0` disables the cache |
+| `photonAddressLayers` | `[]` | e.g. `['house','street']` for address-only results |
 
-## Antwortformat
+## Response format
 
 ```json
 [
@@ -117,54 +121,55 @@ Optional; ohne Eintrag gelten die Defaults.
 ]
 ```
 
-`(Kanton/Bundesland)` erscheint im Label nur, wenn es sich vom Ort
-unterscheidet – Stadtkantone und Stadtstaaten wie Basel-Stadt, Berlin oder
-Wien werden also nicht doppelt genannt.
+`(state)` only appears in the label when it differs from the city — city
+cantons and city states such as Basel-Stadt, Berlin or Vienna are not
+named twice.
 
-## Produktivbetrieb
+## Production use
 
-`photon.komoot.io` wird kostenlos und **ohne SLA** bereitgestellt. Für
-dauerhaften CRM-Einsatz ist eine eigene Photon-Instanz die saubere Lösung
-(Docker, DACH-Extrakt); danach genügt es, `photonAddressUrl` umzustellen.
+`photon.komoot.io` is provided free of charge and **without an SLA**. For
+permanent CRM use, a self-hosted Photon instance is the clean solution
+(Docker, regional extract); afterwards it is enough to change
+`photonAddressUrl`.
 
-Die Daten stammen aus OpenStreetMap und stehen unter der ODbL. Ein Hinweis
-„© OpenStreetMap-Mitwirkende" im Formular ist angebracht.
+The data comes from OpenStreetMap and is licensed under the ODbL. A
+"© OpenStreetMap contributors" notice in the form is appropriate.
 
-Nicht enthalten: Rate Limiting pro Nutzer. Der Cache dämpft die Last; bei
-vielen gleichzeitigen Nutzern zusätzlich drosseln oder self-hosten. Der
-Cache-Ordner `data/cache/photon-address` wächst und wird vom
-EspoCRM-Rebuild nicht geleert.
+Not included: per-user rate limiting. The cache dampens the load; with
+many concurrent users, throttle additionally or self-host. The cache
+directory `data/cache/photon-address` grows and is not cleared by the
+EspoCRM rebuild.
 
-## Projektstruktur
+## Project structure
 
 ```
-src/                    Extension-Quellen (wird 1:1 zur ZIP)
+src/                    Extension sources (becomes the ZIP 1:1)
 ├── manifest.json
-├── files/custom/Espo/Modules/PhotonAddress/    Backend
-└── files/client/custom/modules/photon-address/ Frontend
-contrib/serverless/     Node.js-Variante für Vercel/Lambda/Worker
-docs/REVIEW.md          Technisches Review, verifizierte v10-Annahmen
-tests/                  Mapping-Tests gegen Fixtures (PHP + Node)
-build.sh                baut das installierbare Paket
+├── files/custom/Espo/Modules/PhotonAddress/    backend
+└── files/client/custom/modules/photon-address/ frontend
+contrib/serverless/     Node.js variant for Vercel/Lambda/Worker
+docs/REVIEW.md          technical review, verified v10 assumptions
+tests/                  mapping tests against fixtures (PHP + Node)
+build.sh                builds the installable package
 ```
 
-## Entwicklung
+## Development
 
 ```bash
-bash tests/run.sh    # Lint (PHP/JS/JSON) + Mapping-Tests
-./build.sh           # Paket bauen
+bash tests/run.sh    # lint (PHP/JS/JSON) + mapping tests
+./build.sh           # build the package
 ```
 
-Die Tests laufen ohne EspoCRM-Installation: `ResultMapper` hat bewusst keine
-Espo-Abhängigkeiten, und die Photon-Antwort wird aus
-`tests/fixtures/features.json` gemockt. PHP- und Node-Implementierung werden
-gegen dieselben Fixtures geprüft und müssen identische Ergebnisse liefern.
+The tests run without an EspoCRM installation: `ResultMapper` deliberately
+has no Espo dependencies, and the Photon response is mocked from
+`tests/fixtures/features.json`. The PHP and Node implementations are
+checked against the same fixtures and must produce identical results.
 
-**Release:** Version in `src/manifest.json` und `CHANGELOG.md` anheben, dann
-einen Tag `vX.Y.Z` pushen. Die Action baut, testet, prüft Tag gegen Manifest
-und hängt die ZIP ans Release.
+**Release:** bump the version in `src/manifest.json` and `CHANGELOG.md`,
+then push a `vX.Y.Z` tag. The action builds, tests, checks the tag
+against the manifest and attaches the ZIP to the release.
 
-## Lizenz
+## License
 
-[AGPL-3.0-or-later](LICENSE) – dieselbe Lizenz wie EspoCRM, da die Extension
-direkt auf dessen Klassen aufsetzt.
+[AGPL-3.0-or-later](LICENSE) — the same license as EspoCRM, since the
+extension builds directly on its classes.
