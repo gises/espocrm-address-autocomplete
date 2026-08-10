@@ -3,6 +3,20 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.2.1] – 2026-08-10
+
+### Behoben
+
+- Die Trefferliste war auf die Breite des Strassenfelds begrenzt und
+  schnitt lange Labels ab. Der Dropdown-Container wächst jetzt mit dem
+  Inhalt (Feldbreite als Untergrenze, Viewport als Obergrenze).
+
+### Geändert
+
+- Anzeigename im Manifest von «Photon Address Autocomplete (DACH)» zu
+  «Photon Address Autocomplete» — die Länderauswahl ist seit 1.1.0
+  konfigurierbar, der DACH-Zusatz war irreführend.
+
 ## [1.2.0] – 2026-08-10
 
 ### Neu

@@ -67,6 +67,7 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
                 lookupFunction: query => this.photonLookup(query),
                 formatResult: item => this.formatSuggestion(item),
                 onSelect: item => this.applySuggestion(item),
+                beforeRender: container => this.adjustSuggestionContainer(container),
             });
 
             // Gleiches Aufraeum-Muster wie im Core-Address-Feld.
@@ -121,6 +122,26 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
 
                     return [];
                 });
+        }
+
+        /**
+         * devbridge-autocomplete setzt die Container-Breite bei jedem
+         * suggest() fix auf die Breite des Strassenfelds; die Labels
+         * (Strasse - PLZ Ort (Kanton), Land) sind dafuer regelmaessig zu
+         * lang und werden vom Theme abgeschnitten (white-space: nowrap,
+         * overflow: hidden). Die Feldbreite bleibt als Untergrenze, nach
+         * oben darf der Container mit dem Inhalt wachsen - beforeRender
+         * laeuft nach adjustContainerWidth() und gewinnt daher.
+         *
+         * @param {HTMLElement} container
+         */
+        adjustSuggestionContainer(container) {
+            if (container.style.width && container.style.width !== 'auto') {
+                container.style.minWidth = container.style.width;
+            }
+
+            container.style.width = 'auto';
+            container.style.maxWidth = 'calc(100vw - 30px)';
         }
 
         /**
