@@ -142,9 +142,12 @@ Die Daten stammen aus OpenStreetMap und stehen unter der ODbL. Ein Hinweis
 „© OpenStreetMap-Mitwirkende" im Formular ist angebracht.
 
 Nicht enthalten: Rate Limiting pro Nutzer. Der Cache dämpft die Last; bei
-vielen gleichzeitigen Nutzern zusätzlich drosseln oder self-hosten. Der
-Cache-Ordner `data/cache/photon-address` wächst und wird vom
-EspoCRM-Rebuild nicht geleert.
+vielen gleichzeitigen Nutzern zusätzlich drosseln oder self-hosten.
+
+Der geplante Job **Photon Address: Cache-Bereinigung** (wird bei der
+Installation angelegt, täglich 03:30) löscht abgelaufene Einträge aus dem
+Cache-Ordner `data/cache/photon-address` — der EspoCRM-Rebuild fasst
+diesen Ordner nicht an.
 
 ## Projektstruktur
 

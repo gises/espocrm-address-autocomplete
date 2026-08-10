@@ -1,0 +1,7 @@
+{
+    "PhotonAddressCacheCleanup": {
+        "jobClassName": "Espo\\Modules\\PhotonAddress\\Jobs\\CacheCleanup",
+        "scheduling": "30 3 * * *",
+        "isDefault": true
+    }
+}

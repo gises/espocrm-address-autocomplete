@@ -144,9 +144,11 @@ The data comes from OpenStreetMap and is licensed under the ODbL. A
 "© OpenStreetMap contributors" notice in the form is appropriate.
 
 Not included: per-user rate limiting. The cache dampens the load; with
-many concurrent users, throttle additionally or self-host. The cache
-directory `data/cache/photon-address` grows and is not cleared by the
-EspoCRM rebuild.
+many concurrent users, throttle additionally or self-host.
+
+The scheduled job **Photon Address: Cache Cleanup** (created on install,
+daily at 03:30) removes expired entries from the cache directory
+`data/cache/photon-address` — the EspoCRM rebuild does not touch it.
 
 ## Project structure
 

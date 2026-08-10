@@ -3,6 +3,20 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.5.0] – 2026-08-10
+
+### Neu
+
+- Scheduled Job **«Photon Address: Cache-Bereinigung»** (täglich 03:30,
+  DE/EN übersetzt): löscht Einträge aus `data/cache/photon-address`,
+  die älter als die konfigurierte Cache-TTL sind; bei TTL 0
+  (Cache deaktiviert) werden alle Restdateien entfernt. `AfterInstall`
+  legt den Job-Datensatz an, falls er fehlt (Espos Populator für
+  `app/scheduledJobs.json` läuft nur über die Konsole); das neue
+  `AfterUninstall`-Skript räumt ihn bei einer Deinstallation wieder
+  weg. Damit ist der letzte bekannte Betriebspunkt geschlossen —
+  der Cache-Ordner wächst nicht mehr unbegrenzt.
+
 ## [1.4.0] – 2026-08-10
 
 ### Neu

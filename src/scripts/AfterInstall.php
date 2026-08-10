@@ -65,5 +65,34 @@ class AfterInstall
         if ($isChanged) {
             $configWriter->save();
         }
+
+        $this->createScheduledJob($container);
+    }
+
+    /**
+     * Legt den Cache-Bereinigungs-Job an, falls er fehlt. Espos eigener
+     * Populator fuer app/scheduledJobs.json laeuft nur ueber die
+     * Konsole (command.php populate-scheduled-jobs), nicht beim Rebuild.
+     */
+    private function createScheduledJob(Container $container): void
+    {
+        /** @var \Espo\ORM\EntityManager $entityManager */
+        $entityManager = $container->get('entityManager');
+
+        $existing = $entityManager
+            ->getRDBRepository('ScheduledJob')
+            ->where(['job' => 'PhotonAddressCacheCleanup'])
+            ->findOne();
+
+        if ($existing) {
+            return;
+        }
+
+        $entityManager->createEntity('ScheduledJob', [
+            'name' => 'Photon Address: Cache Cleanup',
+            'job' => 'PhotonAddressCacheCleanup',
+            'status' => 'Active',
+            'scheduling' => '30 3 * * *',
+        ]);
     }
 }
