@@ -45,7 +45,13 @@ class PhotonClient
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => $this->photonConfig->getTimeout(),
             CURLOPT_TIMEOUT => $this->photonConfig->getTimeout(),
-            CURLOPT_FOLLOWLOCATION => false,
+            // Redirects mitgehen (begrenzt, nur http/https): Espos
+            // URL-Feld ergaenzt bei Eingabe ohne Schema "http://", und
+            // photon.komoot.io antwortet darauf mit 301 auf HTTPS. Ohne
+            // Redirect-Folge fiele jede Suche mit "HTTP 301" aus.
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 3,
+            CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
             CURLOPT_ENCODING => '',
             CURLOPT_HTTPHEADER => ['Accept: application/json'],
             // Fairer Umgang mit der oeffentlichen Instanz: identifizierbarer Agent.

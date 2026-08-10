@@ -3,6 +3,16 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.3.2] – 2026-08-10
+
+### Behoben
+
+- Alle Suchen fielen mit «Photon returned HTTP 301» aus, wenn die
+  Endpoint-URL als `http://…` konfiguriert war — Espos URL-Feld ergänzt
+  bei Eingabe ohne Schema selbst `http://`, und `photon.komoot.io`
+  leitet HTTP per 301 auf HTTPS um. Der Client folgt Redirects jetzt
+  (max. 3, nur http/https).
+
 ## [1.3.1] – 2026-08-10
 
 ### Behoben
