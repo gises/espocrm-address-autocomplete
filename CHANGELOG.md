@@ -3,6 +3,21 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.3.1] – 2026-08-10
+
+### Behoben
+
+- Der Formularkontext wurde in den Photon-Suchtext gemischt; das
+  Volltext-Matching liess die Ortsangabe dominieren: «Grubstrasse 14»
+  mit Kontext Mainz lieferte beliebige «…straße 14»-Treffer in Mainz,
+  und bewusst eingegebene Strassen aus anderen Ländern erschienen erst
+  nach weiteren Zeichen. Der Kontext-Ort wird jetzt einmalig geokodiert
+  (gecacht, auch negativ) und als Photon-Location-Bias übergeben
+  (lat/lon, zoom 12, location_bias_scale 0.4) — die Suche läuft wieder
+  mit dem reinen Strassentext, Photon gewichtet selbst nach Nähe,
+  nichts wird ausgeschlossen. Das exakte Ort/Land-Ranking aus 1.3.0
+  bleibt zusätzlich bestehen.
+
 ## [1.3.0] – 2026-08-10
 
 ### Neu

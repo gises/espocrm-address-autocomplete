@@ -51,10 +51,12 @@ falls die Real-Estate-Extension installiert ist – RealEstateProperty
 wirkungslos und stört nicht.
 
 Bereits ausgefüllte Subfelder (Ort, PLZ, Land) lenken die Strassensuche:
-Sie fliessen serverseitig in die Photon-Query ein, und Treffer aus dem
-eingegebenen Ort bzw. Land stehen oben — abweichende Treffer bleiben
-darunter wählbar. Liefert die Kontext-Suche nichts, wird einmal breit
-ohne Kontext nachgesucht.
+Der Kontext-Ort wird einmalig geokodiert (gecacht) und als Location-Bias
+(lat/lon) an Photon übergeben — Treffer nahe dem eingegebenen Ort stehen
+oben, Strassen anderswo bleiben findbar; auch das bewusste Eintippen
+einer Strasse aus einem anderen Land funktioniert. Treffer, die exakt
+zum eingegebenen Ort bzw. Land passen, werden zusätzlich nach oben
+sortiert.
 
 Weitere Adressfelder aktivieren – `custom/Espo/Custom/Resources/metadata/entityDefs/<Entity>.json`:
 

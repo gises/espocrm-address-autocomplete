@@ -59,12 +59,14 @@ class SearchService
             return $cached;
         }
 
+        $bias = $context !== [] ? $this->resolveBias($context) : null;
+
         try {
             // Bewusst mehr Treffer anfragen als ausgeliefert werden:
             // der defensive Laenderfilter und die Deduplizierung koennen
             // Eintraege entfernen. Bei limit=5 direkt an Photon koennte
             // sonst eine leere Liste zurueckkommen.
-            $features = $this->client->search($this->buildPhotonQuery($q, $context), min($limit * 3, 20));
+            $features = $this->client->search($q, min($limit * 3, 20), $bias);
         }
         catch (Throwable $e) {
             $this->log->error('PhotonAddress: ' . $e->getMessage());
@@ -117,27 +119,77 @@ class SearchService
     }
 
     /**
-     * Photon kennt auf der oeffentlichen Instanz keine strukturierte Suche;
-     * der Kontext wird deshalb als Volltext an die Query gehaengt und
-     * hebt Treffer aus dem richtigen Ort ueber das Ranking nach oben.
+     * Ermittelt den Ankerpunkt fuer Photons Location-Bias aus PLZ/Ort/Land.
+     *
+     * Der Kontext wird bewusst NICHT in den Suchtext gemischt: Photons
+     * Volltext-Matching laesst sonst die Ortsangabe dominieren und liefert
+     * beliebige Strassen im Kontext-Ort statt des getippten Namens
+     * ("Grubstrasse 14" + Mainz ergab "Josefsstrasse 14, Mainz" usw.).
+     * Stattdessen wird der Ort einmal geokodiert (gecacht) und als
+     * lat/lon-Bias uebergeben - Photon gewichtet dann selbst nach Naehe,
+     * ohne Treffer anderswo auszuschliessen.
      *
      * @param array<string, string> $context
+     * @return array{lat: float, lon: float}|null
      */
-    private function buildPhotonQuery(string $q, array $context): string
+    private function resolveBias(array $context): ?array
     {
-        $parts = [$q];
-
-        $zipCity = trim(($context['zip'] ?? '') . ' ' . ($context['city'] ?? ''));
-
-        if ($zipCity !== '') {
-            $parts[] = $zipCity;
-        }
+        $locationQuery = trim(($context['zip'] ?? '') . ' ' . ($context['city'] ?? ''));
 
         if (($context['country'] ?? '') !== '') {
-            $parts[] = $context['country'];
+            $locationQuery = trim($locationQuery . ', ' . $context['country'], ' ,');
         }
 
-        return implode(', ', $parts);
+        if ($locationQuery === '') {
+            return null;
+        }
+
+        $cacheKey = sha1(implode('|', [
+            'location',
+            mb_strtolower($locationQuery),
+            implode(',', $this->photonConfig->getCountryCodes()),
+            $this->photonConfig->getUrl(),
+        ]));
+
+        $cached = $this->readCache($cacheKey);
+
+        if ($cached !== null) {
+            return isset($cached['lat'], $cached['lon'])
+                ? ['lat' => (float) $cached['lat'], 'lon' => (float) $cached['lon']]
+                : null;
+        }
+
+        try {
+            $features = $this->client->search($locationQuery, 1);
+        }
+        catch (Throwable $e) {
+            // Ohne Bias laeuft die Suche einfach ungewichtet weiter.
+            $this->log->warning('PhotonAddress: bias lookup failed. ' . $e->getMessage());
+
+            return null;
+        }
+
+        $coordinates = $features[0]['geometry']['coordinates'] ?? null;
+
+        if (
+            !is_array($coordinates)
+            || !isset($coordinates[0], $coordinates[1])
+            || !is_numeric($coordinates[0])
+            || !is_numeric($coordinates[1])
+        ) {
+            // Auch "nicht aufloesbar" cachen, sonst geokodiert jeder
+            // Tastendruck denselben unbrauchbaren Kontext erneut.
+            $this->writeCache($cacheKey, []);
+
+            return null;
+        }
+
+        // GeoJSON-Koordinaten sind [lon, lat].
+        $bias = ['lat' => (float) $coordinates[1], 'lon' => (float) $coordinates[0]];
+
+        $this->writeCache($cacheKey, $bias);
+
+        return $bias;
     }
 
     /**

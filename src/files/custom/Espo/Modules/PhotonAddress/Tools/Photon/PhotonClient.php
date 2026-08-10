@@ -17,18 +17,26 @@ use RuntimeException;
  */
 class PhotonClient
 {
+    // Ortsgewichtung: zoom 12 entspricht Stadt-Massstab,
+    // location_bias_scale steuert das Gewicht (0..1, Photon-Default 0.2).
+    private const int BIAS_ZOOM = 12;
+    private const float BIAS_SCALE = 0.4;
+
     public function __construct(
         private readonly PhotonConfig $photonConfig,
         private readonly Log $log
     ) {}
 
     /**
+     * @param array{lat: float, lon: float}|null $bias
+     *        Ankerpunkt fuer Photons Location-Bias (weiches Ranking,
+     *        kein Filter).
      * @return array<int, array<string, mixed>> Die GeoJSON-Features.
      * @throws RuntimeException
      */
-    public function search(string $q, int $limit): array
+    public function search(string $q, int $limit, ?array $bias = null): array
     {
-        $url = $this->buildUrl($q, $limit);
+        $url = $this->buildUrl($q, $limit, $bias);
 
         $ch = curl_init();
 
@@ -76,13 +84,23 @@ class PhotonClient
         return array_values(array_filter($features, 'is_array'));
     }
 
-    private function buildUrl(string $q, int $limit): string
+    /**
+     * @param array{lat: float, lon: float}|null $bias
+     */
+    private function buildUrl(string $q, int $limit, ?array $bias): string
     {
         $parameters = [
             'q' => $q,
             'lang' => $this->photonConfig->getLang(),
             'limit' => (string) $limit,
         ];
+
+        if ($bias !== null) {
+            $parameters['lat'] = (string) $bias['lat'];
+            $parameters['lon'] = (string) $bias['lon'];
+            $parameters['zoom'] = (string) self::BIAS_ZOOM;
+            $parameters['location_bias_scale'] = (string) self::BIAS_SCALE;
+        }
 
         $query = http_build_query($parameters);
 

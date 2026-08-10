@@ -53,10 +53,11 @@ if the Real Estate extension is installed — RealEstateProperty (field
 effect and does no harm.
 
 Already filled sub-fields (city, postal code, country) guide the street
-search: they are fed into the Photon query server-side, and results
-matching the entered city or country are ranked first — results from
-other places remain selectable below. If the contextual search returns
-nothing, one broad search without context is performed.
+search: the context location is geocoded once (cached) and passed to
+Photon as a location bias (lat/lon), so matches near the entered place
+rank first while streets elsewhere remain findable — deliberately typing
+a street from another country still works. Results exactly matching the
+entered city or country are additionally ranked to the top.
 
 To enable further address fields —
 `custom/Espo/Custom/Resources/metadata/entityDefs/<Entity>.json`:
