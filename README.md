@@ -133,6 +133,17 @@ Optional; without an entry the defaults apply.
 cantons and city states such as Basel-Stadt, Berlin or Vienna are not
 named twice.
 
+Formatting follows the postal convention of the **country of the address
+found**, regardless of the user's locale: in 40 countries following the
+anglophone and francophone tradition (GB, IE, US, CA, AU, IN, FR, …) the
+house number precedes the street ("29/2 Hardengreen Industrial Estate"),
+everywhere else it follows it ("Bahnhofstrasse 8"). For GB and IE the
+state field is filled from Photon's `county` (e.g. "Midlothian") instead
+of `state`, which only carries the constituent country there
+(England/Scotland/Wales). Reference for edge cases:
+[OpenCage address-formatting](https://github.com/OpenCageData/address-formatting)
+— adding a country is a one-line change in both mappers.
+
 ## Production use
 
 `photon.komoot.io` is provided free of charge and **without an SLA**. For

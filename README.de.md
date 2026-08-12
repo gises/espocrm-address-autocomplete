@@ -131,6 +131,17 @@ Optional; ohne Eintrag gelten die Defaults.
 unterscheidet – Stadtkantone und Stadtstaaten wie Basel-Stadt, Berlin oder
 Wien werden also nicht doppelt genannt.
 
+Die Aufbereitung folgt der postalischen Konvention des **Landes der
+gefundenen Adresse**, unabhängig vom Benutzer: In 40 Ländern der
+anglophonen und frankophonen Tradition (GB, IE, US, CA, AU, IN, FR, …)
+steht die Hausnummer vor der Strasse («29/2 Hardengreen Industrial
+Estate»), überall sonst dahinter («Bahnhofstrasse 8»). Für GB und IE wird
+das Kanton/Bundesland-Feld aus Photons `county` befüllt (z. B.
+«Midlothian») statt aus `state`, das dort nur den Landesteil trägt
+(England/Schottland/Wales). Referenz für Zweifelsfälle:
+[OpenCage address-formatting](https://github.com/OpenCageData/address-formatting)
+– ein weiteres Land ist eine Zeile in beiden Mappern.
+
 ## Produktivbetrieb
 
 `photon.komoot.io` wird kostenlos und **ohne SLA** bereitgestellt. Für
