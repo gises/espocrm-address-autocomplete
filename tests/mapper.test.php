@@ -18,7 +18,7 @@ use Espo\Modules\PhotonAddress\Tools\Photon\ResultMapper;
 $features = json_decode(file_get_contents(__DIR__ . '/fixtures/features.json'), true);
 
 $mapper = new ResultMapper();
-$allowed = ['ch', 'de', 'at'];
+$allowed = ['ch', 'de', 'at', 'gb'];
 
 $results = [];
 
@@ -45,7 +45,7 @@ $assert = function (bool $condition, string $message) use (&$failures): void {
     $failures++;
 };
 
-$assert(count($results) === 3, 'FR-Treffer und unbrauchbarer Eintrag werden gefiltert');
+$assert(count($results) === 4, 'FR-Treffer und unbrauchbarer Eintrag werden gefiltert');
 $assert($results[0]['label'] === 'Bahnhofstrasse 8 – 8001 Zürich, Schweiz', 'Label CH (state == city wird weggelassen)');
 $assert($results[0]['street'] === 'Bahnhofstrasse 8', 'Strasse und Hausnummer zusammengefuegt');
 $assert($results[0]['zip'] === '8001', 'PLZ');
@@ -57,6 +57,12 @@ $assert($results[1]['street'] === null, 'Ortstreffer setzt keine Strasse');
 $assert($results[1]['label'] === '10117 Berlin, Deutschland', 'Label DE Ortstreffer');
 $assert($results[2]['street'] === 'Kärntner Straße', 'name als Fallback fuer street');
 $assert($results[2]['label'] === 'Kärntner Straße – 1010 Wien, Österreich', 'Label AT');
+$assert($results[3]['street'] === '29/2 Hardengreen Industrial Estate', 'GB: Hausnummer vor der Strasse');
+$assert($results[3]['state'] === 'Midlothian', 'GB: county statt state (Landesteil)');
+$assert(
+    $results[3]['label'] === '29/2 Hardengreen Industrial Estate – EH22 3DN Dalkeith (Midlothian), Vereinigtes Königreich',
+    'Label GB'
+);
 
 echo "\n";
 

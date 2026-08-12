@@ -39,6 +39,14 @@ const MIN_CHARS = 3;
  */
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://crm.example.com';
 
+// Laender, in denen die Hausnummer VOR der Strasse steht
+// ("29/2 Hardengreen Industrial Estate") - im Rest gilt Strasse zuerst.
+const NUMBER_FIRST_COUNTRIES = ['GB', 'IE', 'FR', 'US', 'CA', 'AU', 'NZ', 'ZA', 'LU'];
+
+// Laender, in denen Photons "state" nur den Landesteil traegt
+// (England/Schottland/Wales) und "county" ins State-Feld gehoert.
+const COUNTY_AS_STATE_COUNTRIES = ['GB', 'IE'];
+
 const corsHeaders = {
     'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
     'Access-Control-Allow-Methods': 'GET,OPTIONS',
@@ -119,14 +127,23 @@ function mapFeature(feature) {
     // Strassen ohne Hausnummer steht der Name in "name".
     const streetBase = isPlace ? firstNonEmpty(p.street) : firstNonEmpty(p.street, p.name);
     const houseNumber = firstNonEmpty(p.housenumber);
-    const street = streetBase && houseNumber ? `${streetBase} ${houseNumber}` : streetBase;
+
+    const street = streetBase && houseNumber
+        ? (NUMBER_FIRST_COUNTRIES.includes(countryCode)
+            ? `${houseNumber} ${streetBase}`
+            : `${streetBase} ${houseNumber}`)
+        : streetBase;
 
     const city = isPlace
         ? firstNonEmpty(p.name, p.city, p.district, p.county)
         : firstNonEmpty(p.city, p.district, p.county);
 
     const zip = firstNonEmpty(p.postcode);
-    const state = firstNonEmpty(p.state);
+
+    const state = COUNTY_AS_STATE_COUNTRIES.includes(countryCode)
+        ? firstNonEmpty(p.county, p.state)
+        : firstNonEmpty(p.state);
+
     const country = firstNonEmpty(p.country);
 
     if (!city && !zip) {

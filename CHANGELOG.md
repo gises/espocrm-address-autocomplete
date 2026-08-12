@@ -3,6 +3,23 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.5.1] – 2026-08-12
+
+### Behoben
+
+Community-Feedback aus dem EspoCRM-Forum (Test mit UK-Adressen):
+
+- Die Hausnummer steht jetzt länderabhängig vor oder nach der Strasse:
+  in GB, IE, FR, US, CA, AU, NZ, ZA und LU vorne
+  («29/2 Hardengreen Industrial Estate»), sonst wie bisher hinten
+  («Bahnhofstrasse 8»).
+- In GB und IE wird das State-Feld aus Photons `county` befüllt
+  (z. B. «Midlothian») statt aus `state`, das dort nur den Landesteil
+  trägt (England/Schottland/Wales). Fallback auf `state`, wenn kein
+  County geliefert wird.
+- Beide Regeln identisch in PHP- und Node-Mapper umgesetzt; die
+  gemeinsamen Fixtures decken den UK-Fall jetzt ab.
+
 ## [1.5.0] – 2026-08-10
 
 ### Neu

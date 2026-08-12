@@ -16,6 +16,10 @@ const features = JSON.parse(
     fs.readFileSync(path.join(__dirname, 'fixtures', 'features.json'), 'utf8')
 );
 
+// GB gehoert fuer den UK-Testfall zu den erlaubten Laendern (muss vor
+// dem require gesetzt sein - das Modul liest die Env beim Laden).
+process.env.PHOTON_COUNTRIES = 'ch,de,at,gb';
+
 let capturedUrl = null;
 
 // Photon wird nicht real angefragt - der Test prueft URL-Aufbau und Mapping.
@@ -45,7 +49,7 @@ const {searchAddresses} = require('../contrib/serverless/photon-proxy.js');
     assert.ok(capturedUrl.includes('lang=de'), 'lang=de');
     assert.ok(capturedUrl.includes('limit=15'), 'Overfetch vor dem Filtern');
 
-    assert.strictEqual(results.length, 3, 'FR-Treffer und unbrauchbarer Eintrag gefiltert');
+    assert.strictEqual(results.length, 4, 'FR-Treffer und unbrauchbarer Eintrag gefiltert');
 
     assert.strictEqual(results[0].label, 'Bahnhofstrasse 8 – 8001 Zürich, Schweiz');
     assert.strictEqual(results[0].street, 'Bahnhofstrasse 8');
@@ -61,6 +65,17 @@ const {searchAddresses} = require('../contrib/serverless/photon-proxy.js');
 
     assert.strictEqual(results[2].street, 'Kärntner Straße', 'name als Fallback fuer street');
     assert.strictEqual(results[2].label, 'Kärntner Straße – 1010 Wien, Österreich');
+
+    assert.strictEqual(
+        results[3].street,
+        '29/2 Hardengreen Industrial Estate',
+        'GB: Hausnummer steht vor der Strasse'
+    );
+    assert.strictEqual(results[3].state, 'Midlothian', 'GB: county statt state (Landesteil)');
+    assert.strictEqual(
+        results[3].label,
+        '29/2 Hardengreen Industrial Estate – EH22 3DN Dalkeith (Midlothian), Vereinigtes Königreich'
+    );
 
     assert.deepStrictEqual(await searchAddresses('ab'), [], 'Abbruch unter 3 Zeichen');
 

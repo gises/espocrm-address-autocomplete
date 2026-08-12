@@ -11,6 +11,20 @@ namespace Espo\Modules\PhotonAddress\Tools\Photon;
 class ResultMapper
 {
     /**
+     * Laender, in denen die Hausnummer VOR der Strasse steht
+     * ("29/2 Hardengreen Industrial Estate", "10 Downing Street") -
+     * im Rest gilt Strasse zuerst ("Bahnhofstrasse 8").
+     */
+    private const array NUMBER_FIRST_COUNTRIES = ['GB', 'IE', 'FR', 'US', 'CA', 'AU', 'NZ', 'ZA', 'LU'];
+
+    /**
+     * Laender, in denen Photons "state" nur den Landesteil traegt
+     * (England/Schottland/Wales) und "county" das ist, was ins
+     * State-Feld des Formulars gehoert (z. B. Midlothian).
+     */
+    private const array COUNTY_AS_STATE_COUNTRIES = ['GB', 'IE'];
+
+    /**
      * @param array<string, mixed> $feature
      * @param string[] $allowedCountryCodes Kleingeschrieben.
      * @return array<string, mixed>|null Null, wenn das Feature verworfen wird.
@@ -35,10 +49,10 @@ class ResultMapper
             return null;
         }
 
-        $street = $this->buildStreet($properties);
+        $street = $this->buildStreet($properties, $countryCode);
         $zip = $this->stringOrNull($properties['postcode'] ?? null);
         $city = $this->buildCity($properties);
-        $state = $this->stringOrNull($properties['state'] ?? null);
+        $state = $this->buildState($properties, $countryCode);
         $country = $this->stringOrNull($properties['country'] ?? null);
 
         // Ohne Ort ist der Eintrag fuer ein Adressformular wertlos.
@@ -69,7 +83,7 @@ class ResultMapper
      *
      * @param array<string, mixed> $properties
      */
-    private function buildStreet(array $properties): ?string
+    private function buildStreet(array $properties, string $countryCode): ?string
     {
         // Ortstreffer tragen den Ortsnamen in "name" - der darf nicht als
         // Strasse ins Formular wandern.
@@ -84,7 +98,29 @@ class ResultMapper
 
         $houseNumber = $this->stringOrNull($properties['housenumber'] ?? null);
 
-        return $houseNumber !== null ? "{$street} {$houseNumber}" : $street;
+        if ($houseNumber === null) {
+            return $street;
+        }
+
+        return in_array($countryCode, self::NUMBER_FIRST_COUNTRIES, true)
+            ? "{$houseNumber} {$street}"
+            : "{$street} {$houseNumber}";
+    }
+
+    /**
+     * Kanton/Bundesland/County - je nach Landeskonvention.
+     *
+     * @param array<string, mixed> $properties
+     */
+    private function buildState(array $properties, string $countryCode): ?string
+    {
+        $state = $this->stringOrNull($properties['state'] ?? null);
+
+        if (!in_array($countryCode, self::COUNTY_AS_STATE_COUNTRIES, true)) {
+            return $state;
+        }
+
+        return $this->stringOrNull($properties['county'] ?? null) ?? $state;
     }
 
     /**
