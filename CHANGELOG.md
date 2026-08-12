@@ -3,6 +3,16 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.5.2] – 2026-08-12
+
+### Geändert
+
+- Die Liste der Länder mit Hausnummer-zuerst-Konvention ist von 9 auf
+  40 Einträge erweitert (anglophone und frankophone Posttradition
+  sowie TH/VN). Massgeblich ist immer das Land der gefundenen
+  Adresse, nicht der Benutzer. Referenz für Zweifelsfälle:
+  OpenCage address-formatting.
+
 ## [1.5.1] – 2026-08-12
 
 ### Behoben

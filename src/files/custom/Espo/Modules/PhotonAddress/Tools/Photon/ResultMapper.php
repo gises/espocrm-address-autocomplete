@@ -12,10 +12,23 @@ class ResultMapper
 {
     /**
      * Laender, in denen die Hausnummer VOR der Strasse steht
-     * ("29/2 Hardengreen Industrial Estate", "10 Downing Street") -
-     * im Rest gilt Strasse zuerst ("Bahnhofstrasse 8").
+     * ("29/2 Hardengreen Industrial Estate", "10 Downing Street",
+     * "12 rue de la Paix") - im Rest gilt Strasse zuerst
+     * ("Bahnhofstrasse 8"). Massgeblich ist das Land der ADRESSE,
+     * nicht der Benutzer. Im Wesentlichen die anglophone und
+     * frankophone Posttradition; Referenz fuer Zweifelsfaelle:
+     * https://github.com/OpenCageData/address-formatting
      */
-    private const array NUMBER_FIRST_COUNTRIES = ['GB', 'IE', 'FR', 'US', 'CA', 'AU', 'NZ', 'ZA', 'LU'];
+    private const array NUMBER_FIRST_COUNTRIES = [
+        // anglophon
+        'GB', 'IE', 'US', 'CA', 'AU', 'NZ', 'ZA', 'IN', 'PK', 'LK', 'BD',
+        'SG', 'MY', 'HK', 'PH', 'KE', 'NG', 'GH', 'MT', 'JM', 'TT', 'BZ',
+        'GY', 'FJ', 'PG', 'JE', 'GG', 'IM', 'GI',
+        // frankophon
+        'FR', 'LU', 'MC', 'HT', 'MA', 'DZ', 'TN', 'SN', 'CI', 'CM',
+        // weitere mit Nummer-zuerst-Konvention
+        'TH', 'VN',
+    ];
 
     /**
      * Laender, in denen Photons "state" nur den Landesteil traegt

@@ -39,9 +39,20 @@ const MIN_CHARS = 3;
  */
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://crm.example.com';
 
-// Laender, in denen die Hausnummer VOR der Strasse steht
-// ("29/2 Hardengreen Industrial Estate") - im Rest gilt Strasse zuerst.
-const NUMBER_FIRST_COUNTRIES = ['GB', 'IE', 'FR', 'US', 'CA', 'AU', 'NZ', 'ZA', 'LU'];
+// Laender, in denen die Hausnummer VOR der Strasse steht - im Rest gilt
+// Strasse zuerst. Massgeblich ist das Land der Adresse, nicht der
+// Benutzer. Identisch zur PHP-Liste in ResultMapper.php pflegen!
+// Referenz: https://github.com/OpenCageData/address-formatting
+const NUMBER_FIRST_COUNTRIES = [
+    // anglophon
+    'GB', 'IE', 'US', 'CA', 'AU', 'NZ', 'ZA', 'IN', 'PK', 'LK', 'BD',
+    'SG', 'MY', 'HK', 'PH', 'KE', 'NG', 'GH', 'MT', 'JM', 'TT', 'BZ',
+    'GY', 'FJ', 'PG', 'JE', 'GG', 'IM', 'GI',
+    // frankophon
+    'FR', 'LU', 'MC', 'HT', 'MA', 'DZ', 'TN', 'SN', 'CI', 'CM',
+    // weitere mit Nummer-zuerst-Konvention
+    'TH', 'VN',
+];
 
 // Laender, in denen Photons "state" nur den Landesteil traegt
 // (England/Schottland/Wales) und "county" ins State-Feld gehoert.
