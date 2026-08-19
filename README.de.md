@@ -115,6 +115,8 @@ Optional; ohne Eintrag gelten die Defaults.
   {
     "label": "Bahnhofstrasse 8 – 8001 Zürich, Schweiz",
     "street": "Bahnhofstrasse 8",
+    "houseNumber": "8",
+    "numberFirst": false,
     "zip": "8001",
     "city": "Zürich",
     "state": "Zürich",
@@ -141,6 +143,12 @@ das Kanton/Bundesland-Feld aus Photons `county` befüllt (z. B.
 (England/Schottland/Wales). Referenz für Zweifelsfälle:
 [OpenCage address-formatting](https://github.com/OpenCageData/address-formatting)
 – ein weiteres Land ist eine Zeile in beiden Mappern.
+
+OSM kennt nicht jede Hausnummer (in UK besonders lückenhaft, da Royal
+Mails Adressdatenbank proprietär ist und nicht importiert werden darf).
+Wer eine Hausnummer tippt und einen Strassen-Treffer ohne Nummer
+übernimmt, behält die getippte Nummer deshalb – platziert nach der
+Konvention des Landes, statt sie zu verlieren.
 
 ## Produktivbetrieb
 

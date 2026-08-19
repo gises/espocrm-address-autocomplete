@@ -27,6 +27,8 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
      * @property {string} value    Wert fuer das Strassenfeld.
      * @property {string} label    Anzeigetext im Dropdown.
      * @property {?string} street
+     * @property {?string} houseNumber  Roh-Hausnummer des Treffers.
+     * @property {boolean} numberFirst  Hausnummer-vor-Strasse-Konvention.
      * @property {?string} zip
      * @property {?string} city
      * @property {?string} state
@@ -42,6 +44,14 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
          * @type {?string}
          */
         photonAcceptedValue = null
+
+        /**
+         * Zuletzt getippter Suchbegriff. devbridge ueberschreibt das
+         * Eingabefeld VOR dem onSelect-Callback - zum Zeitpunkt der
+         * Uebernahme steht der getippte Text also nicht mehr im DOM.
+         * @type {?string}
+         */
+        photonLastTerm = null
 
         afterRender() {
             super.afterRender();
@@ -100,6 +110,8 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
             if (this.photonAcceptedValue !== null && term === this.photonAcceptedValue) {
                 return Promise.resolve([]);
             }
+
+            this.photonLastTerm = term;
 
             return Ajax.getRequest('PhotonAddress/search', this.buildSearchParams(term))
                 .then(response => {
@@ -214,8 +226,10 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
          * @param {PhotonSuggestion} item
          */
         applySuggestion(item) {
+            const street = this.buildStreetValue(item);
+
             const map = {
-                [this.streetField]: item.street,
+                [this.streetField]: street,
                 [this.postalCodeField]: item.zip,
                 [this.cityField]: item.city,
                 [this.stateField]: item.state,
@@ -223,7 +237,7 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
             };
 
             // Sperrt den unmittelbar folgenden Fokus-Lookup.
-            this.photonAcceptedValue = (item.street || '').trim();
+            this.photonAcceptedValue = (street || '').trim();
 
             const attributes = {};
 
@@ -244,6 +258,69 @@ define(['views/fields/address', 'ui/autocomplete', 'ajax'], function (AddressFie
 
             // Programmatisches .val() loest kein change-Event aus.
             this.trigger('change');
+        }
+
+        /**
+         * OSM kennt laengst nicht jede Hausnummer (in UK besonders
+         * lueckenhaft, weil Royal Mails Adressdatenbank proprietaer ist
+         * und nicht importiert werden darf). Waehlt der Nutzer einen
+         * Strassen-Treffer ohne Hausnummer, bleibt eine bereits getippte
+         * Nummer deshalb erhalten statt verworfen zu werden -
+         * positioniert nach der Konvention des Treffer-Landes.
+         *
+         * @param {PhotonSuggestion} item
+         * @return {string}
+         */
+        buildStreetValue(item) {
+            const street = item.street || '';
+
+            if (street === '' || item.houseNumber) {
+                return street;
+            }
+
+            const typedNumber = this.extractHouseNumber(this.photonLastTerm || '');
+
+            if (!typedNumber) {
+                return street;
+            }
+
+            // Steht das Token bereits im Strassennamen ("Route 66"),
+            // nichts doppelt einfuegen.
+            const contained = street
+                .split(/\s+/)
+                .some(token => token.toLowerCase() === typedNumber.toLowerCase());
+
+            if (contained) {
+                return street;
+            }
+
+            return item.numberFirst ? `${typedNumber} ${street}` : `${street} ${typedNumber}`;
+        }
+
+        /**
+         * Erstes oder letztes Token des Suchbegriffs, das wie eine
+         * Hausnummer aussieht ("79", "12a", "76-3", "29/2").
+         *
+         * @param {string} term
+         * @return {?string}
+         */
+        extractHouseNumber(term) {
+            const tokens = term.trim().split(/\s+/);
+
+            // Nur eine Nummer ohne Strassenname ist keine Adresse.
+            if (tokens.length < 2) {
+                return null;
+            }
+
+            const pattern = /^\d{1,5}[a-z]?(?:[/\-]\d{1,4}[a-z]?)?$/i;
+
+            if (pattern.test(tokens[0])) {
+                return tokens[0];
+            }
+
+            const last = tokens[tokens.length - 1];
+
+            return pattern.test(last) ? last : null;
         }
 
         /**

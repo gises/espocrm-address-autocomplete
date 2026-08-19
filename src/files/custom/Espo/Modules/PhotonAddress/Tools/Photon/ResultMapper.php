@@ -78,6 +78,11 @@ class ResultMapper
         return [
             'label' => $this->buildLabel($street, $zip, $city, $state, $country),
             'street' => $street,
+            // Roh-Hausnummer und Konvention separat: das Frontend kann so
+            // bei Strassen-Treffern ohne Nummer (OSM-Datenluecke, v. a. UK)
+            // eine bereits getippte Nummer korrekt positioniert erhalten.
+            'houseNumber' => $this->stringOrNull($properties['housenumber'] ?? null),
+            'numberFirst' => in_array($countryCode, self::NUMBER_FIRST_COUNTRIES, true),
             'zip' => $zip,
             'city' => $city,
             'state' => $state,

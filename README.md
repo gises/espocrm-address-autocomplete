@@ -117,6 +117,8 @@ Optional; without an entry the defaults apply.
   {
     "label": "Bahnhofstrasse 8 – 8001 Zürich, Schweiz",
     "street": "Bahnhofstrasse 8",
+    "houseNumber": "8",
+    "numberFirst": false,
     "zip": "8001",
     "city": "Zürich",
     "state": "Zürich",
@@ -143,6 +145,12 @@ of `state`, which only carries the constituent country there
 (England/Scotland/Wales). Reference for edge cases:
 [OpenCage address-formatting](https://github.com/OpenCageData/address-formatting)
 — adding a country is a one-line change in both mappers.
+
+OSM does not know every house number (UK coverage is notably patchy,
+since Royal Mail's address database is proprietary and cannot be
+imported). When you type a house number and pick a street-level
+suggestion that has none, the typed number is therefore kept and placed
+according to the country's convention instead of being discarded.
 
 ## Production use
 

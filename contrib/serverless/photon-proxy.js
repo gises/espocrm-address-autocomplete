@@ -166,6 +166,9 @@ function mapFeature(feature) {
     return {
         label: buildLabel({street, zip, city, state, country}),
         street,
+        // Roh-Hausnummer und Konvention separat - siehe ResultMapper.php.
+        houseNumber,
+        numberFirst: NUMBER_FIRST_COUNTRIES.includes(countryCode),
         zip,
         city,
         state,

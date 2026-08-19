@@ -3,6 +3,25 @@
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [1.6.0] – 2026-08-12
+
+### Neu
+
+Community-Feedback (UK): OSM kennt viele britische Hausnummern nicht
+(Royal Mails PAF ist proprietär und darf nicht importiert werden) —
+Photon liefert dann nur Strassen-Treffer.
+
+- Getippte Hausnummern überleben jetzt die Übernahme: Wählt man bei
+  eingegebenem «79 Wester Broom Drive» den Strassen-Treffer «Wester
+  Broom Drive» (ohne Hausnummer), wird die 79 nicht mehr verworfen,
+  sondern nach der Konvention des Treffer-Landes platziert. Erkannt
+  werden Formen wie «79», «12a», «76-3», «29/2» am Anfang oder Ende
+  des Suchbegriffs; steht das Token bereits im Strassennamen
+  («Route 66»), passiert nichts. Treffer mit eigener Hausnummer
+  bleiben unberührt.
+- Endpoint-Antwort um `houseNumber` (Roh-Hausnummer, nullable) und
+  `numberFirst` (bool) erweitert; PHP- und Node-Mapper identisch.
+
 ## [1.5.2] – 2026-08-12
 
 ### Geändert

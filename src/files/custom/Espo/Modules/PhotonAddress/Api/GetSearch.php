@@ -23,7 +23,8 @@ use Espo\Modules\PhotonAddress\Tools\Photon\SearchService;
  * Subfeldern des Adressformulars; sie engen die Suche ein.
  *
  * Antwort: flaches JSON-Array mit den Keys
- * label, street, zip, city, state, country, countryCode, lat, lon, osmId.
+ * label, street, houseNumber, numberFirst, zip, city, state, country,
+ * countryCode, lat, lon, osmId.
  */
 class GetSearch implements Action
 {

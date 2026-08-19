@@ -53,6 +53,8 @@ const {searchAddresses} = require('../contrib/serverless/photon-proxy.js');
 
     assert.strictEqual(results[0].label, 'Bahnhofstrasse 8 – 8001 Zürich, Schweiz');
     assert.strictEqual(results[0].street, 'Bahnhofstrasse 8');
+    assert.strictEqual(results[0].houseNumber, '8', 'Roh-Hausnummer separat');
+    assert.strictEqual(results[0].numberFirst, false, 'CH: Strasse zuerst');
     assert.strictEqual(results[0].zip, '8001');
     assert.strictEqual(results[0].city, 'Zürich');
     assert.strictEqual(results[0].state, 'Zürich');
@@ -72,6 +74,9 @@ const {searchAddresses} = require('../contrib/serverless/photon-proxy.js');
         'GB: Hausnummer steht vor der Strasse'
     );
     assert.strictEqual(results[3].state, 'Midlothian', 'GB: county statt state (Landesteil)');
+    assert.strictEqual(results[3].houseNumber, '29/2', 'GB: Roh-Hausnummer separat');
+    assert.strictEqual(results[3].numberFirst, true, 'GB: Nummer zuerst');
+    assert.strictEqual(results[2].houseNumber, null, 'Strassen-Treffer ohne Hausnummer');
     assert.strictEqual(
         results[3].label,
         '29/2 Hardengreen Industrial Estate – EH22 3DN Dalkeith (Midlothian), Vereinigtes Königreich'
